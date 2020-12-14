@@ -16,9 +16,12 @@ class CreateLaravelplansTables extends Migration
         // plans table
         Schema::create('plans', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('owner_id')->unsigned()->default(1);
             $table->string('name');
             $table->text('description')->nullable();
-            $table->decimal('price', 7, 2)->default('0.00');
+            $table->decimal('price', 7, 3)->default('0.00');
+            $table->integer('currency_id')->unsigned()->default(1);
+            $table->string('interval')->default('month');
             $table->string('interval')->default('month');
             $table->smallInteger('interval_count')->default(1);
             $table->smallInteger('trial_period_days')->nullable();

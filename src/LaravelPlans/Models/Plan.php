@@ -15,9 +15,11 @@ class Plan extends Model implements PlanInterface
      * @var array
      */
     protected $fillable = [
+        'owner_id',
         'name',
         'description',
         'price',
+        'currency_id',
         'interval',
         'interval_count',
         'trial_period_days',
