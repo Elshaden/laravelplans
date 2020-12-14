@@ -1,6 +1,6 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Exceptions;
+namespace Elshaden\LaravelPlans\Exceptions;
 
 class InvalidIntervalException extends \Exception
 {

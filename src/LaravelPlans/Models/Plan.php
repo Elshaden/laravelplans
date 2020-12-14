@@ -1,11 +1,11 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Models;
+namespace Elshaden\LaravelPlans\Models;
 
-use Czechbox\LaravelPlans\Period;
+use Elshaden\LaravelPlans\Period;
 use Illuminate\Database\Eloquent\Model;
-use Czechbox\LaravelPlans\Contracts\PlanInterface;
-use Czechbox\LaravelPlans\Exceptions\InvalidPlanFeatureException;
+use Elshaden\LaravelPlans\Contracts\PlanInterface;
+use Elshaden\LaravelPlans\Exceptions\InvalidPlanFeatureException;
 
 class Plan extends Model implements PlanInterface
 {

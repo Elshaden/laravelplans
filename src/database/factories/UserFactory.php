@@ -1,6 +1,6 @@
 <?php
 
-use Czechbox\LaravelPlans\Tests\Models\User;
+use Elshaden\LaravelPlans\Tests\Models\User;
 
 $factory->define(User::class, function (Faker\Generator $faker) {
     return [

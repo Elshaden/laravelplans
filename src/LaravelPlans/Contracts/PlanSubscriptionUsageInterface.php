@@ -1,6 +1,6 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Contracts;
+namespace Elshaden\LaravelPlans\Contracts;
 
 interface PlanSubscriptionUsageInterface
 {

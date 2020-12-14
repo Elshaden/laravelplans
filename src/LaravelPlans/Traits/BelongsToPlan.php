@@ -1,6 +1,6 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Traits;
+namespace Elshaden\LaravelPlans\Traits;
 
 trait BelongsToPlan
 {

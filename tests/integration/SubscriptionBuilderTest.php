@@ -1,11 +1,11 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Tests\Integration\Models;
+namespace Elshaden\LaravelPlans\Tests\Integration\Models;
 
-use Czechbox\LaravelPlans\Models\Plan;
-use Czechbox\LaravelPlans\Tests\TestCase;
-use Czechbox\LaravelPlans\Tests\Models\User;
-use Czechbox\LaravelPlans\SubscriptionBuilder;
+use Elshaden\LaravelPlans\Models\Plan;
+use Elshaden\LaravelPlans\Tests\TestCase;
+use Elshaden\LaravelPlans\Tests\Models\User;
+use Elshaden\LaravelPlans\SubscriptionBuilder;
 
 class SubscriptionBuilderTest extends TestCase
 {

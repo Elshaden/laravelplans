@@ -1,10 +1,10 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Models;
+namespace Elshaden\LaravelPlans\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Czechbox\LaravelPlans\Contracts\PlanSubscriptionUsageInterface;
+use Elshaden\LaravelPlans\Contracts\PlanSubscriptionUsageInterface;
 
 class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterface
 {

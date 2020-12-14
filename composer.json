@@ -1,5 +1,5 @@
 {
-    "name": "czechbox/laravelplans",
+    "name": "Elshaden/laravelplans",
     "description": "SaaS style recurring plans for Laravel.",
     "keywords": ["plans", "laravel", "subscriptions", "memberships"],
     "license": "MIT",
@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Czechbox\\LaravelPlans\\": "src/LaravelPlans/"
+            "Elshaden\\LaravelPlans\\": "src/LaravelPlans/"
         }
     },
     "autoload-dev": {
@@ -26,13 +26,13 @@
             "tests/TestCase.php"
         ],
         "psr-4": {
-            "Czechbox\\LaravelPlans\\Tests\\": "tests/"
+            "Elshaden\\LaravelPlans\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Czechbox\\LaravelPlans\\LaravelPlansServiceProvider"
+                "Elshaden\\LaravelPlans\\LaravelPlansServiceProvider"
             ]
         }
     },

@@ -1,9 +1,9 @@
 <?php
 
-namespace Czechbox\LaravelPlans;
+namespace Elshaden\LaravelPlans;
 
 use Carbon\Carbon;
-use Czechbox\LaravelPlans\Exceptions\InvalidIntervalException;
+use Elshaden\LaravelPlans\Exceptions\InvalidIntervalException;
 
 class Period
 {
@@ -62,7 +62,7 @@ class Period
      * @param  int $count Interval count
      * @param  string $start Starting point
      * @return  void
-     * @throws  \Czechbox\LaravelPlans\Exceptions\InvalidIntervalException
+     * @throws  \Elshaden\LaravelPlans\Exceptions\InvalidIntervalException
      */
     public function __construct($interval = 'month', $count = 1, $start = '')
     {

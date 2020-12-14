@@ -1,10 +1,10 @@
 <?php
 
-namespace Czechbox\LaravelPlans\Unit;
+namespace Elshaden\LaravelPlans\Unit;
 
-use Czechbox\LaravelPlans\Period;
-use Czechbox\LaravelPlans\Tests\TestCase;
-use Czechbox\LaravelPlans\Exceptions\InvalidIntervalException;
+use Elshaden\LaravelPlans\Period;
+use Elshaden\LaravelPlans\Tests\TestCase;
+use Elshaden\LaravelPlans\Exceptions\InvalidIntervalException;
 
 class PeriodTest extends TestCase
 {

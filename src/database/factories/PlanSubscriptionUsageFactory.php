@@ -1,7 +1,7 @@
 <?php
 
-use Czechbox\LaravelPlans\Models\PlanSubscription;
-use Czechbox\LaravelPlans\Models\PlanSubscriptionUsage;
+use Elshaden\LaravelPlans\Models\PlanSubscription;
+use Elshaden\LaravelPlans\Models\PlanSubscriptionUsage;
 
 $factory->define(PlanSubscriptionUsage::class, function (Faker\Generator $faker) {
     return [
