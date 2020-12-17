@@ -2,36 +2,44 @@
 
 namespace Elshaden\LaravelPlans\Models;
 
-use DB;
 use App;
+use App\Exceptions\SubscriptionInvalidException;
+use App\Traits\HashIdTrait;
+use App\Traits\HasResourceKeyTrait;
 use Carbon\Carbon;
-use LogicException;
-use Elshaden\LaravelPlans\Period;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Database\Eloquent\Model;
-use Elshaden\LaravelPlans\Models\PlanFeature;
-use Elshaden\LaravelPlans\SubscriptionAbility;
-use Elshaden\LaravelPlans\Traits\BelongsToPlan;
+use DB;
 use Elshaden\LaravelPlans\Contracts\PlanInterface;
-use Elshaden\LaravelPlans\SubscriptionUsageManager;
-use Elshaden\LaravelPlans\Events\SubscriptionCreated;
-use Elshaden\LaravelPlans\Events\SubscriptionRenewed;
-use Elshaden\LaravelPlans\Events\SubscriptionCanceled;
-use Elshaden\LaravelPlans\Events\SubscriptionPlanChanged;
 use Elshaden\LaravelPlans\Contracts\PlanSubscriptionInterface;
-use Elshaden\LaravelPlans\Exceptions\InvalidPlanFeatureException;
-use Elshaden\LaravelPlans\Exceptions\FeatureValueFormatIncompatibleException;
+use Elshaden\LaravelPlans\Events\SubscriptionCanceled;
+use Elshaden\LaravelPlans\Events\SubscriptionCreated;
+use Elshaden\LaravelPlans\Events\SubscriptionPlanChanged;
+use Elshaden\LaravelPlans\Events\SubscriptionRenewed;
+use Elshaden\LaravelPlans\Period;
+use Elshaden\LaravelPlans\SubscriptionAbility;
+use Elshaden\LaravelPlans\SubscriptionUsageManager;
+use Elshaden\LaravelPlans\Traits\BelongsToPlan;
+use Illuminate\Database\Eloquent\Model;
+use LogicException;
 
 class PlanSubscription extends Model implements PlanSubscriptionInterface
 {
     use BelongsToPlan;
+    use HasResourceKeyTrait;
+    use HashIdTrait;
+
+    /**
+     * A resource key to be used by the the JSON API Serializer responses.
+     */
+    protected $resourceKey = 'plan_subscriptions';
+
+    public $hash_id_salt_key = 3;
 
     /**
      * Subscription statuses
      */
-    const STATUS_ENDED      = 'ended';
-    const STATUS_ACTIVE     = 'active';
-    const STATUS_CANCELED   = 'canceled';
+    const STATUS_ENDED = 'expired';
+    const STATUS_ACTIVE = 'active';
+    const STATUS_CANCELED = 'canceled';
 
     /**
      * The attributes that are mass assignable.
@@ -76,8 +84,8 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     /**
      * Boot function for using with User Events.
      *
-     * @todo Move events to an Observer.
      * @return void
+     * @todo Move events to an Observer.
      */
     protected static function boot()
     {
@@ -91,7 +99,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
 
         static::saving(function ($model) {
             // Set period if it wasn't set
-            if (! $model->ends_at) {
+            if (!$model->ends_at) {
                 $model->setNewPeriod();
             }
         });
@@ -154,7 +162,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      */
     public function isActive()
     {
-        if ((! $this->isEnded() or $this->onTrial()) and ! $this->isCanceledImmediately()) {
+        if ((!$this->isEnded() or $this->onTrial()) and !$this->isCanceledImmediately()) {
             return true;
         }
 
@@ -168,7 +176,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      */
     public function onTrial()
     {
-        if (! is_null($trialEndsAt = $this->trial_ends_at)) {
+        if (!is_null($trialEndsAt = $this->trial_ends_at)) {
             return Carbon::now()->lt(Carbon::instance($trialEndsAt));
         }
 
@@ -182,7 +190,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      */
     public function isCanceled()
     {
-        return  ! is_null($this->canceled_at);
+        return !is_null($this->canceled_at);
     }
 
     /**
@@ -192,7 +200,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
      */
     public function isCanceledImmediately()
     {
-        return  (! is_null($this->canceled_at) and $this->canceled_immediately === true);
+        return (!is_null($this->canceled_at));
     }
 
     /**
@@ -210,7 +218,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     /**
      * Cancel subscription.
      *
-     * @param  bool $immediately
+     * @param bool $immediately
      * @return $this
      */
     public function cancel($immediately = false)
@@ -247,7 +255,7 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         // today... and sice we are basically creating a new billing cycle,
         // the usage data will be cleared.
         if (is_null($this->plan) or $this->plan->interval !== $plan->interval or
-                $this->plan->interval_count !== $plan->interval_count) {
+            $this->plan->interval_count !== $plan->interval_count) {
             // Set period
             $this->setNewPeriod($plan->interval, $plan->interval_count);
 
@@ -265,15 +273,19 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     /**
      * Renew subscription period.
      *
-     * @throws  \LogicException
      * @return  $this
+     * @throws  \LogicException
      */
-    public function renew()
+    public function renew($force =Null)
     {
-        if ($this->isEnded() and $this->isCanceled()) {
-            throw new LogicException(
-                'Unable to renew canceled ended subscription.'
-            );
+        if ( $this->isCanceled()) {
+            if($force){
+                $this->canceled_at = null;
+                $this->save();
+
+            }   else {
+                throw new SubscriptionInvalidException('Unable to renew canceled subscription.');
+            }
         }
 
         $subscription = $this;
@@ -283,8 +295,9 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
             $usageManager = new SubscriptionUsageManager($subscription);
             $usageManager->clear();
 
+            $realstart = $this->GetRealStartdate($subscription);
             // Renew period
-            $subscription->setNewPeriod();
+            $subscription->setNewPeriod($this->plan->interval, $this->plan->interval_count, $realstart);
             $subscription->canceled_at = null;
             $subscription->save();
         });
@@ -311,8 +324,8 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
     /**
      * Find by subscribable id.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder
-     * @param  int $subscribable
+     * @param \Illuminate\Database\Eloquent\Builder
+     * @param int $subscribable
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeByUser($query, $subscribable)
@@ -366,12 +379,24 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         $query->where('ends_at', '<=', date('Y-m-d H:i:s'));
     }
 
+    public function GetRealStartdate($subscription)
+    {
+
+        if (config('laravelplans.start_from_end')) {
+            return $subscription->ends_at;
+        }
+        $currentEnds = Carbon::parse($subscription->ends_at);
+        if ($currentEnds->gte(Carbon::today())) return $subscription->ends_at;
+
+        return Carbon::today();
+    }
+
     /**
      * Set subscription period.
      *
-     * @param  string $interval
-     * @param  int $interval_count
-     * @param  string $start Start date
+     * @param string $interval
+     * @param int $interval_count
+     * @param string $start Start date
      * @return  $this
      */
     protected function setNewPeriod($interval = '', $interval_count = '', $start = '')
@@ -379,16 +404,14 @@ class PlanSubscription extends Model implements PlanSubscriptionInterface
         if (empty($interval)) {
             $interval = $this->plan->interval;
         }
-
         if (empty($interval_count)) {
             $interval_count = $this->plan->interval_count;
         }
-
         $period = new Period($interval, $interval_count, $start);
-
         $this->starts_at = $period->getStartDate();
         $this->ends_at = $period->getEndDate();
-
         return $this;
     }
+
+
 }

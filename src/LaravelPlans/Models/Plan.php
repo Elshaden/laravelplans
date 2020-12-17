@@ -2,6 +2,8 @@
 
 namespace Elshaden\LaravelPlans\Models;
 
+use App\Traits\HashIdTrait;
+use App\Traits\HasResourceKeyTrait;
 use Elshaden\LaravelPlans\Period;
 use Illuminate\Database\Eloquent\Model;
 use Elshaden\LaravelPlans\Contracts\PlanInterface;
@@ -9,6 +11,14 @@ use Elshaden\LaravelPlans\Exceptions\InvalidPlanFeatureException;
 
 class Plan extends Model implements PlanInterface
 {
+   use HasResourceKeyTrait;
+    use HashIdTrait;
+    public $hash_id_salt_key=5;
+
+    /**
+     * A resource key to be used by the the JSON API Serializer responses.
+     */
+    protected $resourceKey = 'plans';
     /**
      * The attributes that are mass assignable.
      *
@@ -135,4 +145,6 @@ class Plan extends Model implements PlanInterface
 
         return $feature;
     }
+
+
 }

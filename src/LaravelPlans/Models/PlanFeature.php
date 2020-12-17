@@ -43,4 +43,9 @@ class PlanFeature extends Model implements PlanFeatureInterface
     {
         return $this->hasMany(config('laravelplans.models.plan_subscription_usage'));
     }
+
+    /**
+     * A resource key to be used by the the JSON API Serializer responses.
+     */
+    protected $resourceKey = 'plan_features';
 }

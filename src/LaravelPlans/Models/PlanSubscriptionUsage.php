@@ -73,4 +73,11 @@ class PlanSubscriptionUsage extends Model implements PlanSubscriptionUsageInterf
 
         return Carbon::now()->gte($this->valid_until);
     }
+
+
+
+    /**
+     * A resource key to be used by the the JSON API Serializer responses.
+     */
+    protected $resourceKey = 'plan_subscription_usages';
 }
